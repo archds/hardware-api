@@ -983,6 +983,7 @@ dependencies = [
  "cargo-watch",
  "rocket",
  "rocket_okapi",
+ "schemars",
  "serde",
 ]
 
