@@ -59,7 +59,7 @@ pub async fn search(request: &String) -> Result<Vec<Keyboard>, &'static str> {
     load().await.map(|items| {
         items
             .into_iter()
-            .filter_map(|item| match item.name.contains(request) {
+            .filter_map(|item| match item.name.to_lowercase().contains(&request.to_lowercase()) {
                 true => Some(item),
                 false => None,
             })
