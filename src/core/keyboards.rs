@@ -6,6 +6,7 @@ use rocket::tokio::io::AsyncReadExt;
 use rocket_okapi::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use crate::api::SortingBy;
 use crate::DATA_PATH;
 
 #[derive(Deserialize, Serialize, JsonSchema, Clone)]
@@ -30,16 +31,16 @@ pub enum ConnectionType {
 #[serde(crate = "rocket::serde")]
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct Keyboard {
-    name: String,
-    rating: u8,
-    rating_count: u32,
-    price_usd: Option<f32>,
-    style: Style,
-    switch_type: Option<String>,
-    backlit: Option<String>,
-    tenkeyless: bool,
-    connection_type: ConnectionType,
-    color: Option<String>,
+    pub name: String,
+    pub rating: u8,
+    pub rating_count: u32,
+    pub price_usd: Option<f32>,
+    pub style: Style,
+    pub switch_type: Option<String>,
+    pub backlit: Option<String>,
+    pub tenkeyless: bool,
+    pub connection_type: ConnectionType,
+    pub color: Option<String>,
 }
 
 pub async fn load() -> Result<Vec<Keyboard>, &'static str> {
@@ -47,5 +48,40 @@ pub async fn load() -> Result<Vec<Keyboard>, &'static str> {
     let mut file = File::open(path).await.unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).await.unwrap();
-    Ok(serde_json::from_str(contents.as_ref()).unwrap())
+    let mut keyboards: Vec<Keyboard> = serde_json::from_str(contents.as_ref()).unwrap();
+    keyboards.sort_by(|a, b| a.name.cmp(&b.name));
+    keyboards.dedup_by(|a, b| a.name == b.name);
+
+    Ok(keyboards)
+}
+
+pub async fn search(request: &String) -> Result<Vec<Keyboard>, &'static str> {
+    load().await.map(|items| {
+        items
+            .into_iter()
+            .filter_map(|item| match item.name.contains(request) {
+                true => Some(item),
+                false => None,
+            })
+            .collect()
+    })
+}
+
+pub fn sort(by: &Option<SortingBy>, mut keyboards: Vec<Keyboard>) -> Vec<Keyboard> {
+    if by.is_none() {
+        return keyboards;
+    }
+
+    keyboards.sort_by(|a, b| match by.as_ref().unwrap() {
+        SortingBy::Price => b
+            .price_usd
+            .unwrap_or_default()
+            .total_cmp(&a.price_usd.unwrap_or_default()),
+        SortingBy::Rating => b
+            .price_usd
+            .unwrap_or_default()
+            .total_cmp(&a.price_usd.unwrap_or_default()),
+    });
+
+    keyboards
 }
