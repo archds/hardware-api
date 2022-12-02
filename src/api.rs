@@ -20,12 +20,14 @@ pub enum Category {
 }
 
 #[derive(Debug, PartialEq, JsonSchema, Deserialize, Serialize, FromFormField)]
+#[serde(rename_all = "lowercase")]
 pub enum SortingDirection {
     Ascending,
     Descending,
 }
 
 #[derive(Debug, PartialEq, JsonSchema, Deserialize, Serialize, FromFormField)]
+#[serde(rename_all = "lowercase")]
 pub enum SortingBy {
     Rating,
     Price,
