@@ -1,13 +1,19 @@
 use crate::keyboards;
-use rocket::get;
 use rocket::request::FromParam;
 use rocket::serde::json::Json;
+use rocket::{get, FromForm};
 use rocket_okapi::{openapi, JsonSchema};
 
 #[derive(Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum Category {
     Keyboards,
+}
+
+#[derive(Debug, PartialEq, JsonSchema, FromForm)]
+pub struct Pagination {
+    pub limit: usize,
+    pub offset: usize,
 }
 
 impl FromParam<'_> for Category {
@@ -22,9 +28,15 @@ impl FromParam<'_> for Category {
 }
 
 #[openapi]
-#[get("/items/<category>")]
-pub async fn items(category: Category) -> Result<Json<Vec<keyboards::Keyboard>>, &'static str> {
+#[get("/items/<category>?<pagination..>")]
+pub async fn items(
+    category: Category,
+    pagination: Pagination,
+) -> Result<Json<Vec<keyboards::Keyboard>>, &'static str> {
     match category {
-        Category::Keyboards => keyboards::load().await.map(Json),
+        Category::Keyboards => keyboards::load()
+            .await
+            .map(|items| items[pagination.offset..pagination.limit].to_vec())
+            .map(Json),
     }
 }

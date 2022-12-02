@@ -8,16 +8,16 @@ use serde::{Deserialize, Serialize};
 
 use crate::DATA_PATH;
 
-#[derive(Deserialize, Serialize, JsonSchema)]
+#[derive(Deserialize, Serialize, JsonSchema, Clone)]
 #[serde(crate = "rocket::serde")]
 pub enum Style {
     Gaming,
     Mini,
     Standard,
-    Slim
+    Slim,
 }
 
-#[derive(Deserialize, Serialize, JsonSchema)]
+#[derive(Deserialize, Serialize, JsonSchema, Clone)]
 #[serde(crate = "rocket::serde")]
 pub enum ConnectionType {
     Wired,
@@ -26,7 +26,7 @@ pub enum ConnectionType {
     BluetoothWireless,
 }
 
-#[derive(Deserialize, Serialize, JsonSchema)]
+#[derive(Deserialize, Serialize, JsonSchema, Clone)]
 #[serde(crate = "rocket::serde")]
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct Keyboard {
