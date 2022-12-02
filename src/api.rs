@@ -5,6 +5,7 @@ use rocket::serde::json::Json;
 use rocket_okapi::{openapi, JsonSchema};
 
 #[derive(Debug, PartialEq, JsonSchema)]
+#[serde(rename_all = "lowercase")]
 pub enum Category {
     Keyboards,
 }

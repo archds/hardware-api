@@ -14,6 +14,7 @@ pub enum Style {
     Gaming,
     Mini,
     Standard,
+    Slim
 }
 
 #[derive(Deserialize, Serialize, JsonSchema)]
@@ -27,12 +28,13 @@ pub enum ConnectionType {
 
 #[derive(Deserialize, Serialize, JsonSchema)]
 #[serde(crate = "rocket::serde")]
+#[serde(rename_all(serialize = "camelCase"))]
 pub struct Keyboard {
     name: String,
     rating: u8,
     rating_count: u32,
     price_usd: Option<f32>,
-    style: String,
+    style: Style,
     switch_type: Option<String>,
     backlit: Option<String>,
     tenkeyless: bool,
