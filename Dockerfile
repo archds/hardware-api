@@ -1,3 +1,4 @@
+# docker build . -t rust-hwapi && docker run -p 8000:8000 rust-hwapi
 FROM rust:1.65 as build
 
 RUN USER=root cargo new --bin hardware-api
