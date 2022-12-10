@@ -63,7 +63,7 @@ pub async fn items(
             .await
             .map(|items| keyboards::sort(&params.sort_by, items))
             .map(
-                |items| match params.pg_limit + params.pg_offset > items.len() {
+                |items| match params.pg_limit + params.pg_offset < items.len() {
                     true => items[params.pg_offset..params.pg_offset + params.pg_limit].to_vec(),
                     false => items[params.pg_offset..].to_vec(),
                 },
